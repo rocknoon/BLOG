@@ -1,0 +1,3 @@
+过滤 ' " _ % 加上/ addslash
+如果是数字的话 intval
+如果是字符串的话 屏蔽关键字 入 and union select or update insert delete;
