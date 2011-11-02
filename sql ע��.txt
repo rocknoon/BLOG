@@ -1,3 +1,54 @@
+request 层面的控制
+在 request 层面 我们可能要做的是如何防止非法 html 的标签的输入 例如<script><iframe><html> 
+在这里 我们可以用一个php 函数 htmlspecialchars  http://www.php.net/manual/en/function.htmlspecialchars.php 这样的话前台提交的所有内容 如果包含html 标签的话 就会被转意， 这样在输出的时候  我们这些标签会直接显示在浏览器里边 而不会运行。
+
+sql 层面的控制
+
+如果用户传入的参数 需要用于构造sql 语句的话 那么我们就需要对输入的参数进行再一次过滤， 来达到防止利用sql注入。
+
+常见的sql 注入形式：
+
+
+$sql = "select * from 表名 where name = '" + $_GET['name']  + "'";
+1.HTTP://xxx.xxx.xxx/abc.php?name=rocky
+一切正常
+
+2/HTTP://xxx.xxx.xxx/abc.php?name=rocky'%20or%201='1   (%20 表示空格)
+这时候sql语句
+select * from 表名 where name = 'rocky' or 1='1'
+这个时候所有的条目都会查询出来
+
+
+3.HTTP://xxx.xxx.xxx/abc.php?name=rocky';delete from user where 1='1   (%20 表示空格)
+这时候sql语句
+select * from 表名 where name = 'rocky' or 1='1' order by ID
+所有的东西都会被删除
+
+
+
+那么我们要如何来防止这样的情况呢 
+
+如果期望是字符串 我们在构造sql的时候 将传入字段加入'' 并且对一些特殊字符加入 / 
+
+如果是整数或则浮点的话 我们进行intval() , sprintf('%F', $value) 
+
+具体实现:
+
+function quote( $value , $type ){
+
+	
+
+}
+
+使用
+
+$sql = "select * from rocky where name = ?";
+str_replace( "?" , quote( $value , "String" ) , $sql );
+
+
+
+ 
+
 过滤 ' " _ % 加上/ addslash
 如果是数字的话 intval
 如果是字符串的话 屏蔽关键字 入 and union select or update insert delete;
